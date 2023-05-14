@@ -4,13 +4,13 @@ export GOPATH="${HOME}/software/go"
 export PATH="${HOME}/software/go/bin:${PATH}"
 
 if ! gum -v >/dev/null 2>&1; then
-	GOVERSION=$(go version | {
+	GOVERSION=$(go version 2>/dev/null | {
 		read -r _ _ v _
 		echo "${v#go}"
 	})
 	if [[ -z "${GOVERSION}" ]]; then
-		echo "Installing default go package"
-		sudo apt-get -y install golang
+		echo "Bootstrapping default go package"
+		sudo apt-get -y -qq install golang
 	fi
 	GOVERSION=$(go version | {
 		read -r _ _ v _
@@ -18,9 +18,17 @@ if ! gum -v >/dev/null 2>&1; then
 	})
 	if [[ "$(echo "${GOVERSION%.*} < 1.20" | bc)" -eq 1 ]]; then
 		echo "Updating go"
-		go get golang.org/dl/go1.20.4
-		go1.20.4 download
+		LOG=$(
+			go get golang.org/dl/go1.20.4
+			go1.20.4 download
+		)
+		RET=$?
+		if [[ $RET -ne 0 ]]; then
+			echo -e "Error updating go, log was: \\n ${LOG}"
+			exit 1
+		fi
 	fi
+	echo "Installing gum"
 	LOG=$(go1.20.4 2>&1 install github.com/charmbracelet/gum@latest)
 	RET=$?
 	if [[ $RET -ne 0 ]]; then
