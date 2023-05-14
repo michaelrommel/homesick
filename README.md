@@ -1,5 +1,3 @@
-# Michael Rommel
+## bootstrapping homesick
 
-## dotfiles repository
-
-My homesick bootstrapping file lives [here](./homesick.sh)
+You can download my homesick bootstrapping file [here](./homesick.sh)
