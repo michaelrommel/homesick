@@ -10,17 +10,24 @@ if ! gum -v >/dev/null 2>&1; then
 	})
 	if [[ -z "${GOVERSION}" ]]; then
 		echo "Bootstrapping default go package"
-		sudo apt-get -y -qq install golang
+		LOG=$(
+			sudo apt-get -y install golang 2>&1
+		)
+		RET=$?
+		if [[ $RET -ne 0 ]]; then
+			echo -e "Error bootstrapping go, log was: \\n ${LOG}"
+			exit 1
+		fi
 	fi
-	GOVERSION=$(go version | {
+	GOVERSION=$(go version 2>/dev/null | {
 		read -r _ _ v _
 		echo "${v#go}"
 	})
 	if [[ "$(echo "${GOVERSION%.*} < 1.20" | bc)" -eq 1 ]]; then
 		echo "Updating go"
 		LOG=$(
-			go get golang.org/dl/go1.20.4
-			go1.20.4 download
+			go 2>&1 get golang.org/dl/go1.20.4
+			go1.20.4 2>&1 download
 		)
 		RET=$?
 		if [[ $RET -ne 0 ]]; then
