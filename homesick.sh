@@ -4,12 +4,18 @@ export GOPATH="${HOME}/software/go"
 export PATH="${HOME}/software/go/bin:${PATH}"
 
 if ! gum -v; then
-	GOVERSION=$(go version | { read _ _ v _; echo ${v#go}; })
+	GOVERSION=$(go version | {
+		read _ _ v _
+		echo ${v#go}
+	})
 	if [[ -z "${GOVERSION}" ]]; then
 		echo "Installing default go package"
 		sudo apt-get -y install golang
 	fi
-	GOVERSION=$(go version | { read _ _ v _; echo ${v#go}; })
+	GOVERSION=$(go version | {
+		read _ _ v _
+		echo ${v#go}
+	})
 	if [[ "$(echo "${GOVERSION%.*} < 1.20" | bc)" -eq 1 ]]; then
 		echo "Updating go"
 		go get golang.org/dl/go1.20.4
@@ -18,8 +24,8 @@ if ! gum -v; then
 	go1.20.4 install github.com/charmbracelet/gum@latest
 fi
 
-echo -e "\n\nThe following castles are available.\n"
-echo -e "Each subsequent castle requires the previous one.\n"
+echo -e "\n\nThe following castles are available."
+echo -e "Each subsequent castle requires the previous one."
 echo -e "\nWhich castles shall be installed?"
 
 available_castles=(castle-core castle-tmux castle-coding castle-neovim)
