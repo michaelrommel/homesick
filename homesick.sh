@@ -94,3 +94,16 @@ for castle in "${castles[@]}"; do
 done
 
 gum style --bold --foreground 2 --margin "1 2" "The bootstrapping installation is now complete."
+
+gum format -t markdown <<EOF
+The config files have now been installed, please log off and
+back in now. Otherwise the search paths would not be set correctly.
+
+The editor environment is now preconfigured to automatically
+install all necessary language servers and linters. In order to trigger
+this installation, please do a 'vim test.py' to simulate editing a python
+file. The first time this is done, it will install all neovim packages, but
+they are not activated until you close and re-open the editor a second time.
+Just quit the editor with ':q!' and start the same 'vim test.py' command again.
+This time you should have linting, diagnostics and formatting all activated.
+EOF
