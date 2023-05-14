@@ -3,35 +3,62 @@
 export GOPATH="${HOME}/software/go"
 export PATH="${HOME}/software/go/bin:${PATH}"
 
-if ! gum -v; then
+if ! gum -v >/dev/null 2>&1; then
 	GOVERSION=$(go version | {
-		read _ _ v _
-		echo ${v#go}
+		read -r _ _ v _
+		echo "${v#go}"
 	})
 	if [[ -z "${GOVERSION}" ]]; then
 		echo "Installing default go package"
 		sudo apt-get -y install golang
 	fi
 	GOVERSION=$(go version | {
-		read _ _ v _
-		echo ${v#go}
+		read -r _ _ v _
+		echo "${v#go}"
 	})
 	if [[ "$(echo "${GOVERSION%.*} < 1.20" | bc)" -eq 1 ]]; then
 		echo "Updating go"
 		go get golang.org/dl/go1.20.4
 		go1.20.4 download
 	fi
-	go1.20.4 install github.com/charmbracelet/gum@latest
+	LOG=$(go1.20.4 2>&1 install github.com/charmbracelet/gum@latest)
+	RET=$?
+	if [[ $RET -ne 0 ]]; then
+		echo -e "Error installing gum, log was: \\n ${LOG}"
+		exit 1
+	fi
 fi
 
-echo -e "\n\nThe following castles are available."
-echo -e "Each subsequent castle requires the previous one."
-echo -e "\nWhich castles shall be installed?"
+printComma() {
+	printf "%s," "${@:1:${#}-1}"
+	printf "%s" "${@:${#}}"
+}
+
+# printNewline() {
+# 	printf "%s\n" "${@:1:${#}-1}"
+# 	echo "${@:${#}}"
+# }
+
+gum style --border rounded --width 50 --margin "1 1" --align center --italic --bold \
+	--foreground 4 "Bootstrapping dotfile manager" "(homesick installation)"
+
+gum format -t markdown <<EOF
+Below is a list of several packages, called _castles_. Each subsequent
+castle benefits from the previous ones. Therefore if you deselect some
+castles, some external programs that later packages use may be missing,
+but may not be essential for basic functions.
+EOF
+
+gum style --bold --foreground 5 --margin "1 2" "Which castles shall be installed?"
 
 available_castles=(castle-core castle-tmux castle-coding castle-neovim)
 
-selection=$(for c in "${available_castles[@]}"; do echo "$c"; done | gum choose --height 10 --no-limit)
-mapfile -t castles < <(echo "${selection[@]}")
+selection=$(gum choose --no-limit --selected="$(printComma "${available_castles[@]}")" "${available_castles[@]}")
+while read -r castle; do
+	if [[ -n ${castle} ]]; then
+		castles+=("${castle}")
+	fi
+done < <(echo "${selection[@]}")
 
 if [[ ${#castles[@]} -eq 0 ]]; then
 	echo "No castles to install. Aborting."
@@ -42,9 +69,16 @@ if [[ ! -f ${HOME}/.homesick/repos/homesick/homesick.sh ]]; then
 	git clone https://github.com/michaelrommel/homesick.git "${HOME}/.homesick/repos/homesick"
 fi
 
+# shellcheck disable=1091
 source "${HOME}/.homesick/repos/homesick/homesick.sh"
 
 for castle in "${castles[@]}"; do
-	homesick -f clone "michaelrommel/${castle}"
-	homesick -f link "${castle}"
+	if ! homesick clone -f -q -b "michaelrommel/${castle}"; then
+		homesick pull "${castle}"
+	fi
+	if ! homesick link -f -q -b "${castle}"; then
+		continue
+	fi
 done
+
+gum style --bold --foreground 2 --margin "1 2" "The bootstrapping installation is now complete."
