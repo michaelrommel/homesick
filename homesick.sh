@@ -73,10 +73,10 @@ fi
 source "${HOME}/.homesick/repos/homesick/homesick.sh"
 
 for castle in "${castles[@]}"; do
-	if ! homesick clone -f -q -b "michaelrommel/${castle}"; then
+	if ! homesick clone -f -b "michaelrommel/${castle}"; then
 		homesick pull "${castle}"
 	fi
-	if ! homesick link -f -q -b "${castle}"; then
+	if ! homesick link -f -b "${castle}"; then
 		continue
 	fi
 done
