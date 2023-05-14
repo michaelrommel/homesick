@@ -1,13 +1,17 @@
 #!/bin/bash
 
-export GOPATH=${HOME}/software/go
-export PATH=${HOME}/software/go/bin:${PATH}
+export GOPATH="${HOME}/software/go"
+export PATH="${HOME}/software/go/bin:${PATH}"
 
 if ! gum -v; then
-	if ! go1.20.4 version; then
-		if ! go version; then
-			sudo apt-get -y install golang
-		fi
+	GOVERSION=$(go version | { read _ _ v _; echo ${v#go}; })
+	if [[ -z "${GOVERSION}" ]]; then
+		echo "Installing default go package"
+		sudo apt-get -y install golang
+	fi
+	GOVERSION=$(go version | { read _ _ v _; echo ${v#go}; })
+	if [[ "$(echo "${GOVERSION%.*} < 1.20" | bc)" -eq 1 ]]; then
+		echo "Updating go"
 		go get golang.org/dl/go1.20.4
 		go1.20.4 download
 	fi
@@ -31,5 +35,6 @@ fi
 source "${HOME}/.homesick/repos/homesick/homesick.sh"
 
 for castle in "${castles[@]}"; do
-	homesick -f clone "$castle"
+	homesick -f clone "michaelrommel/${castle}"
+	homesick -f link "${castle}"
 done
