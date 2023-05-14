@@ -43,10 +43,10 @@ gum style --border rounded --width 50 --margin "1 1" --align center --italic --b
 	--foreground 4 "Bootstrapping dotfile manager" "(homesick installation)"
 
 gum format -t markdown <<EOF
-Below is a list of several packages, called _castles_. Each subsequent
-castle benefits from the previous ones. Therefore if you deselect some
-castles, some external programs that later packages use may be missing,
-but may not be essential for basic functions.
+Below is a list of several packages, called _castles_. Each castle can
+be deployed and used on its own, but may benefit from packages installed
+by other castles. For instance, the _neovim_ castle can use rg, fd and other
+tools, the _coding_ castle provides.
 EOF
 
 gum style --bold --foreground 5 --margin "1 2" "Which castles shall be installed?"
@@ -60,17 +60,21 @@ while read -r castle; do
 	fi
 done < <(echo "${selection[@]}")
 
-if [[ ${#castles[@]} -eq 0 ]]; then
-	echo "No castles to install. Aborting."
-	exit 0
-fi
-
 if [[ ! -f ${HOME}/.homesick/repos/homesick/homesick.sh ]]; then
 	git clone https://github.com/michaelrommel/homesick.git "${HOME}/.homesick/repos/homesick"
 fi
 
 # shellcheck disable=1091
 source "${HOME}/.homesick/repos/homesick/homesick.sh"
+
+# link the defaults for a basic account
+homesick link -f -b "homesick"
+
+# set up additional castles, if requested
+if [[ ${#castles[@]} -eq 0 ]]; then
+	echo "No castles to install. Aborting."
+	exit 0
+fi
 
 for castle in "${castles[@]}"; do
 	if ! homesick clone -f -b "michaelrommel/${castle}"; then
