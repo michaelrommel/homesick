@@ -18,6 +18,10 @@ if ! gum -v; then
 	go1.20.4 install github.com/charmbracelet/gum@latest
 fi
 
+echo -e "\n\nThe following castles are available.\n"
+echo -e "Each subsequent castle requires the previous one.\n"
+echo -e "\nWhich castles shall be installed?"
+
 available_castles=(castle-core castle-tmux castle-coding castle-neovim)
 
 selection=$(for c in "${available_castles[@]}"; do echo "$c"; done | gum choose --height 10 --no-limit)
