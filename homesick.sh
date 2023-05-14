@@ -1,21 +1,27 @@
-#!/usr/bin/env bash
-# This script should be sourced in the context of your shell like so:
-# source $HOME/.homesick/repos/.homeshick/homeshick.sh
-# Once the homeshick() function is defined, you can type
-# "homeshick cd CASTLE" to enter a castle.
+#!/bin/bash
 
-homesick() {
-	if [ "$1" = "cd" ] && [ -n "$2" ]; then
-		# We want replicate cd behavior, so don't use cd ... ||
-		# shellcheck disable=SC2164
-		if [[ -d "${HOME}/.homesick/repos/castle-$2" ]]; then
-			prefix=castle-
-		else
-			prefix=
-		fi
-		cd "$HOME/.homesick/repos/${prefix}$2"
-	else
-		"${HOMESICK_DIR:-$HOME/.homesick/repos/homesick}/bin/homesick" "$@"
-	fi
-}
-alias hs=homesick
+export GOPATH=${HOME}/software/go
+sudo apt-get -y install golang
+go get golang.org/dl/go1.20.4
+go1.20.4 download
+go1.20.4 install github.com/charmbracelet/gum@latest
+export PATH=${HOME}/software/go/bin:${PATH}
+
+available_castles=("castle-core" "castle-tmux" "castle-coding" "castle-neovim")
+
+castles=$(echo "${available_castles[@]}" | gum choose --height 10 --no-limit)
+
+if [[ ${#castles[@]} -eq 0 ]]; then
+	echo "No castles to install. Aborting."
+	exit 0
+fi
+
+if [[ ! -f $HOME/.homesick/repos/homesick/homesick.sh ]]; then
+	git clone https://github.com/michaelrommel/homesick.git "$HOME/.homesick/repos/homesick"
+fi
+
+source "$HOME/.homesick/repos/homesick/homesick.sh"
+
+for castle in "${castles[@]}"; do
+	homesick -f clone "$castle"
+done
