@@ -9,7 +9,7 @@ if ! gum -v >/dev/null 2>&1; then
 		echo "${v#go}"
 	})
 	if [[ -z "${GOVERSION}" ]]; then
-		echo "Bootstrapping default go package"
+		echo "Bootstrapping default go package (takes ca. 90 seconds)"
 		LOG=$(
 			sudo apt-get -y -q install golang 2>&1
 		)
@@ -24,7 +24,7 @@ if ! gum -v >/dev/null 2>&1; then
 		echo "${v#go}"
 	})
 	if [[ "$(echo "${GOVERSION%.*} < 1.20" | bc)" -eq 1 ]]; then
-		echo "Updating go"
+		echo "Updating go (takes ca. 60 seconds)"
 		LOG=$(
 			go 2>&1 get golang.org/dl/go1.20.4
 			go1.20.4 2>&1 download
@@ -100,9 +100,7 @@ for castle in "${castles[@]}"; do
 	fi
 done
 
-gum style --bold --foreground 2 --margin "1 2" "The bootstrapping installation is now complete."
-
-gum format -t markdown <<EOF
+gum format -t markdown <<'EOF'
 The config files have now been installed, please log off and
 back in now. Otherwise the search paths would not be set correctly.
 
@@ -117,4 +115,7 @@ Just quit the editor with ':q!' and start the same 'vim test.py'
 command again. This time you should have linting, diagnostics and 
 formatting all activated. The neovim ':checkhealth' command provides 
 diagnostics if something does not work as expected.
+
 EOF
+
+gum style --bold --foreground 2 --margin "1 2" "The bootstrapping installation is now complete!"
