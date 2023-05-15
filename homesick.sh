@@ -54,14 +54,14 @@ printComma() {
 # 	echo "${@:${#}}"
 # }
 
-gum style --border rounded --width 50 --margin "1 1" --align center --italic --bold \
+gum style --border rounded --width 70 --margin "1 1" --align center --italic --bold \
 	--foreground 4 "Bootstrapping dotfile manager" "(homesick installation)"
 
 gum format -t markdown <<EOF
 Below is a list of several packages, called _castles_. Each castle can
 be deployed and used on its own, but may benefit from packages installed
 by other castles. For instance, the _neovim_ castle can use rg, fd and other
-tools, the _coding_ castle provides.
+tools which the _coding_ castle provides.
 EOF
 
 gum style --bold --foreground 5 --margin "1 2" "Which castles shall be installed?"
@@ -106,11 +106,15 @@ gum format -t markdown <<EOF
 The config files have now been installed, please log off and
 back in now. Otherwise the search paths would not be set correctly.
 
-The editor environment is now preconfigured to automatically
-install all necessary language servers and linters. In order to trigger
-this installation, please do a 'vim test.py' to simulate editing a python
-file. The first time this is done, it will install all neovim packages, but
-they are not activated until you close and re-open the editor a second time.
-Just quit the editor with ':q!' and start the same 'vim test.py' command again.
-This time you should have linting, diagnostics and formatting all activated.
+If you have installed the _neovim_ castle, the editor environment is 
+now preconfigured to automatically install all necessary language 
+servers and linters. In order to trigger this installation, please do 
+a 'vim test.py' to simulate editing a python file. The first time 
+this is done, it will install all neovim packages, but they are not 
+activated until you close and re-open the editor a second time.
+
+Just quit the editor with ':q!' and start the same 'vim test.py' 
+command again. This time you should have linting, diagnostics and 
+formatting all activated. The neovim ':checkhealth' command provides 
+diagnostics if something does not work as expected.
 EOF
