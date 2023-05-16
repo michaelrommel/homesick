@@ -9,7 +9,7 @@ if ! gum -v >/dev/null 2>&1; then
 		echo "${v#go}"
 	})
 	if [[ -z "${GOVERSION}" ]]; then
-		echo "Bootstrapping default go package (takes ca. 90 seconds)"
+		echo "Bootstrapping default go package (takes ca. 45 seconds)"
 		LOG=$(
 			sudo apt-get -y -q install golang 2>&1
 		)
@@ -24,7 +24,7 @@ if ! gum -v >/dev/null 2>&1; then
 		echo "${v#go}"
 	})
 	if [[ "$(echo "${GOVERSION%.*} < 1.20" | bc)" -eq 1 ]]; then
-		echo "Updating go (takes ca. 60 seconds)"
+		echo "Updating go (takes ca. 15 seconds)"
 		LOG=$(
 			go 2>&1 get golang.org/dl/go1.20.4
 			go1.20.4 2>&1 download
@@ -35,7 +35,7 @@ if ! gum -v >/dev/null 2>&1; then
 			exit 1
 		fi
 	fi
-	echo "Installing gum"
+	echo "Installing gum (takes ca. 15 seconds)"
 	LOG=$(go1.20.4 2>&1 install github.com/charmbracelet/gum@latest)
 	RET=$?
 	if [[ $RET -ne 0 ]]; then
