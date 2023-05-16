@@ -1,8 +1,7 @@
 #!/bin/bash
 
 GOPATH=$(readlink -f "${HOME}/software")/go
-GOROOT=${GOPATH}
-export GOPATH GOROOT
+export GOPATH
 export PATH="${GOPATH}/bin:${PATH}"
 
 if ! gum -v >/dev/null 2>&1; then
