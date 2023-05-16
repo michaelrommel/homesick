@@ -1,7 +1,9 @@
 #!/bin/bash
 
-export GOPATH="${HOME}/software/go"
-export PATH="${HOME}/software/go/bin:${PATH}"
+GOPATH=$(readlink -f "${HOME}/software")/go
+GOROOT=${GOPATH}
+export GOPATH GOROOT
+export PATH="${GOPATH}/bin:${PATH}"
 
 if ! gum -v >/dev/null 2>&1; then
 	GOVERSION=$(go version 2>/dev/null | {
