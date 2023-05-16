@@ -24,7 +24,8 @@ if ! gum -v >/dev/null 2>&1; then
 		read -r _ _ v _
 		echo "${v#go}"
 	})
-	if [[ "$(echo "${GOVERSION} < 1.20" | bc)" -eq 1 ]]; then
+	# remove the last smantic version number to make it a float
+	if [[ "$(echo "${GOVERSION%.*} < 1.20" | bc)" -eq 1 ]]; then
 		echo "Updating go (takes ca. 15 seconds)"
 		LOG=$(
 			go 2>&1 get golang.org/dl/go1.20.4
