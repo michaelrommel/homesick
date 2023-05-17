@@ -12,7 +12,7 @@ if ! gum -v >/dev/null 2>&1; then
 	if [[ -z "${GOVERSION}" ]]; then
 		echo "Bootstrapping default go package (takes ca. 45 seconds)"
 		LOG=$(
-			sudo apt update
+			sudo apt-get -y update
 			sudo apt-get -y -q install golang 2>&1
 		)
 		RET=$?
