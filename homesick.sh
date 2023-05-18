@@ -32,7 +32,7 @@ if ! gum -v >/dev/null 2>&1; then
 	if [[ "$(echo "${GOVERSION%.*} < ${VERS_GO%@*}" | bc)" -eq 1 ]]; then
 		echo "Updating go (takes ca. 15 seconds)"
 		LOG=$(
-			curl -sL https://raw.githubusercontent.com/kevincobain2000/gobrew/master/git.io.sh | sh
+			curl -sL https://raw.githubusercontent.com/kevincobain2000/gobrew/master/git.io.sh | sh 2>&1
 			"${HOME}/.gobrew/bin/gobrew" use ${VERS_GO}
 		)
 		RET=$?
