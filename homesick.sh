@@ -12,24 +12,8 @@ if ! gum -v >/dev/null 2>&1; then
 		read -r _ _ v _
 		echo "${v#go}"
 	})
-	if [[ -z "${GOVERSION}" ]]; then
-		echo "Bootstrapping default go package (takes ca. 45 seconds)"
-		LOG=$(
-			sudo apt-get -y update
-			sudo apt-get -y -q install golang 2>&1
-		)
-		RET=$?
-		if [[ $RET -ne 0 ]]; then
-			echo -e "Error bootstrapping go, log was: \\n ${LOG}"
-			exit 1
-		fi
-	fi
-	GOVERSION=$(go version 2>/dev/null | {
-		read -r _ _ v _
-		echo "${v#go}"
-	})
 	# compare the semantic minor versions, remove last patch digits to make it a float
-	if [[ "$(echo "${GOVERSION%.*} < ${VERS_GO%@*}" | bc)" -eq 1 ]]; then
+	if [[ -z "${GOVERSION}" || ("$(echo "${GOVERSION%.*} < ${VERS_GO%@*}" | bc)" -eq 1) ]]; then
 		echo "Updating go (takes ca. 15 seconds)"
 		LOG=$(
 			curl -sL https://raw.githubusercontent.com/kevincobain2000/gobrew/master/git.io.sh | sh 2>&1
