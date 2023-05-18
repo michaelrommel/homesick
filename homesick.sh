@@ -1,5 +1,8 @@
 #!/bin/bash
 
+VERS_GO=1.20@latest
+VERS_GUM=latest
+
 GOPATH=$(readlink -f "${HOME}/software")/go
 export GOPATH
 export PATH="${GOPATH}/bin:${PATH}"
@@ -25,12 +28,12 @@ if ! gum -v >/dev/null 2>&1; then
 		read -r _ _ v _
 		echo "${v#go}"
 	})
-	# remove the last smantic version number to make it a float
-	if [[ "$(echo "${GOVERSION%.*} < 1.20" | bc)" -eq 1 ]]; then
+	# compare the semantic minor versions, remove last patch digits to make it a float
+	if [[ "$(echo "${GOVERSION%.*} < ${VERS_GO%@*}" | bc)" -eq 1 ]]; then
 		echo "Updating go (takes ca. 15 seconds)"
 		LOG=$(
-			go 2>&1 get golang.org/dl/go1.20.4
-			go1.20.4 2>&1 download
+			curl -sL https://raw.githubusercontent.com/kevincobain2000/gobrew/master/git.io.sh | sh
+			"${HOME}/.gobrew/bin/gobrew" use ${VERS_GO}
 		)
 		RET=$?
 		if [[ $RET -ne 0 ]]; then
@@ -38,8 +41,9 @@ if ! gum -v >/dev/null 2>&1; then
 			exit 1
 		fi
 	fi
+
 	echo "Installing gum (takes ca. 15 seconds)"
-	LOG=$(go1.20.4 2>&1 install github.com/charmbracelet/gum@latest)
+	LOG=$("${HOME}/.gobrew/current/bin/go" 2>&1 install github.com/charmbracelet/gum@${VERS_GUM})
 	RET=$?
 	if [[ $RET -ne 0 ]]; then
 		echo -e "Error installing gum, log was: \\n ${LOG}"
