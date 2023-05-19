@@ -1,6 +1,7 @@
 echo -n "Initializing"
 
-MYSH=$(readlink /proc/$$/exe)
+#MYSH=$(readlink /proc/$$/exe)
+MYSH=$(ps -o comm= $$)
 if [[ $MYSH =~ "zsh" ]]; then
 	is_zsh=1
 else
