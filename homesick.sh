@@ -7,13 +7,30 @@ GOPATH=$(readlink -f "${HOME}/software")/go
 export GOPATH
 export PATH="${GOPATH}/bin:${PATH}"
 
+satisfied() {
+	IFS="." read -r -a required <<<"${1#*@}"
+	IFS="." read -r -a actual <<<"${2#*@}"
+	if ((required[0] > actual[0])); then
+		return 1
+	else
+		if ((required[0] == actual[0] && \
+			required[1] > actual[1])); then
+			return 1
+		else
+			return 0
+		fi
+	fi
+
+}
+
 if ! gum -v >/dev/null 2>&1; then
 	GOVERSION=$(go version 2>/dev/null | {
 		read -r _ _ v _
 		echo "${v#go}"
 	})
-	# compare the semantic minor versions, remove last patch digits to make it a float
-	if [[ -z "${GOVERSION}" || ("$(echo "${GOVERSION%.*} < ${VERS_GO%@*}" | bc)" -eq 1) ]]; then
+	# compare the semantic minor versions
+	OK=satisfied "${VERS_GO%@*}" "${GOVERSION}"
+	if [[ -z "${GOVERSION}" || ! $OK ]]; then
 		echo "Updating go (takes ca. 15 seconds)"
 		LOG=$(
 			curl -sL https://raw.githubusercontent.com/kevincobain2000/gobrew/master/git.io.sh | sh 2>&1
