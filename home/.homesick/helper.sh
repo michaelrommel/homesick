@@ -27,6 +27,22 @@ is_in() {
 	return 1
 }
 
+satisfied() {
+	IFS="." read -r -a required <<<"${1#*@}"
+	IFS="." read -r -a actual <<<"${2#*@}"
+	if ((required[0] > actual[0])); then
+		return 1
+	else
+		if ((required[0] == actual[0] && \
+			required[1] > actual[1])); then
+			return 1
+		else
+			return 0
+		fi
+	fi
+
+}
+
 has_version() {
 	local pkg="$1"
 	shift
@@ -38,26 +54,32 @@ has_version() {
 	if [[ "${pkg}" =~ @ ]]; then
 		VERS="true"
 		# get all after the at sign, split on dot
-		IFS="." read -r -a vers_required <<<"${pkg#*@}"
+		#IFS="." read -r -a vers_required <<<"${pkg#*@}"
+		vers_required="${pkg#*@}"
 	fi
 
 	for p in "${packages[@]}"; do
 		if [[ "${VERS}" == "true" ]]; then
-			# there was a version specified
 			local pkg_installed="${p%%@*}"
-			IFS="." read -r -a vers_installed <<<"${p#*@}"
 			if [[ "$pkg_required" == "$pkg_installed" ]]; then
-				if ((${vers_required[0]} > ${vers_installed[0]})); then
-					return 1
-				else
-					if ((${vers_required[0]} == ${vers_installed[0]} && \
-						${vers_required[1]} > ${vers_installed[1]})); then
-						return 1
-					else
-						return 0
-					fi
-				fi
+				# there was a version specified
+				vers_installed="${p#*@}"
+				OK=satisfied "${vers_required}" "${vers_installed}"
+				return "$OK"
 			fi
+			# IFS="." read -r -a vers_installed <<<"${p#*@}"
+			# if [[ "$pkg_required" == "$pkg_installed" ]]; then
+			# 	if ((${vers_required[0]} > ${vers_installed[0]})); then
+			# 		return 1
+			# 	else
+			# 		if ((${vers_required[0]} == ${vers_installed[0]} && \
+			# 			${vers_required[1]} > ${vers_installed[1]})); then
+			# 			return 1
+			# 		else
+			# 			return 0
+			# 		fi
+			# 	fi
+			# fi
 		else
 			# no version requirement
 			local pkg_installed="${p%%@*}"
