@@ -28,8 +28,9 @@ is_in() {
 }
 
 satisfied() {
-	IFS="." read -r -a required <<<"${1}"
-	IFS="." read -r -a actual <<<"${2}"
+	# there are some version strings that still contain @ signs, like python
+	IFS="." read -r -a required <<<"${1%@*}"
+	IFS="." read -r -a actual <<<"${2%@*}"
 	if ((required[0] > actual[0])); then
 		return 1
 	else
@@ -64,8 +65,10 @@ has_version() {
 			if [[ "$pkg_required" == "$pkg_installed" ]]; then
 				# there was a version specified
 				vers_installed="${p#*@}"
-				OK=satisfied "${vers_required}" "${vers_installed}"
-				return "$OK"
+				# for some reason bash on macOS does not like directy
+				# assigning the return value of a function to a variable
+				satisfied "${vers_required}" "${vers_installed}"
+				return $?
 			fi
 			# IFS="." read -r -a vers_installed <<<"${p#*@}"
 			# if [[ "$pkg_required" == "$pkg_installed" ]]; then
