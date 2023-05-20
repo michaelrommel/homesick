@@ -111,7 +111,7 @@ check_dpkged() {
 	shift
 	local desired=("$@")
 	local packages
-	mapfile -t packages < <(dpkg-query --list | sed -ne 's/^ii *\([^ ]\{1,\}\) *\([^ ]\{1,\}\) .*/\1@\2/;t nap;d;:nap;p')
+	mapfile -t packages < <(dpkg-query --list | sed -ne 's/^ii *\([^ :]\{1,\}\).* .*\([^ ]\{1,\}\) .*/\1@\2/;t nap;d;:nap;p')
 	for n in "${desired[@]}"; do
 		if ! has_version "$n" "${packages[@]}"; then
 			b+=("${n}")
