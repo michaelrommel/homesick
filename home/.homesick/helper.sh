@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 [[ -x "/usr/bin/uname" ]] && UNAME="/usr/bin/uname"
 [[ -x "/bin/uname" ]] && UNAME="/bin/uname"
@@ -28,8 +28,8 @@ is_in() {
 }
 
 satisfied() {
-	IFS="." read -r -a required <<<"${1#*@}"
-	IFS="." read -r -a actual <<<"${2#*@}"
+	IFS="." read -r -a required <<<"${1}"
+	IFS="." read -r -a actual <<<"${2}"
 	if ((required[0] > actual[0])); then
 		return 1
 	else
