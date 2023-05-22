@@ -29,7 +29,8 @@ if ! gum -v >/dev/null 2>&1; then
 		echo "${v#go}"
 	})
 	# compare the semantic minor versions
-	OK=satisfied "${VERS_GO%@*}" "${GOVERSION}"
+	satisfied "${VERS_GO%@*}" "${GOVERSION}"
+	OK=$?
 	if [[ -z "${GOVERSION}" || ! $OK ]]; then
 		echo "Updating go (takes ca. 15 seconds)"
 		LOG=$(
