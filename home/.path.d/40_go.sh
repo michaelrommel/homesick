@@ -7,6 +7,6 @@ export GOPATH
 # look for go version manager
 if [[ -d "${HOME}/.gobrew/bin" && ! ":${PATH}:" == *:${HOME}/.gobrew/bin:* ]]; then
 	# path has not yet been added
-	export PATH="${HOME}/.gobrew/current/bin:${HOME}/.gobrew/bin:${PATH}"
+	export PATH="${GOPATH}/bin:${HOME}/.gobrew/current/bin:${HOME}/.gobrew/bin:${PATH}"
 	export GOROOT="${HOME}/.gobrew/current/go"
 fi
