@@ -4,7 +4,7 @@
 [[ -x "/bin/uname" ]] && UNAME="/bin/uname"
 
 ARCH=$(${UNAME} -m)
-OS=$(${UNAME} -o)
+OS=$(${UNAME} -s)
 OSRELEASE=$("${UNAME}" -r)
 
 get_osarch() {
