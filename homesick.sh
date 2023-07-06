@@ -7,6 +7,28 @@ GOPATH=$(readlink -f "${HOME}/software")/go
 export GOPATH
 export PATH="${GOPATH}/bin:${PATH}"
 
+get_os() {
+	os="$(uname -s)"
+	if [ "$os" = Darwin ]; then
+		echo "macos"
+	elif [ "$os" = Linux ]; then
+		echo "linux"
+	else
+		error "unsupported OS: $os"
+	fi
+}
+
+get_arch() {
+	arch="$(uname -m)"
+	if [ "$arch" = x86_64 ]; then
+		echo "x64"
+	elif [ "$arch" = aarch64 ] || [ "$arch" = arm64 ]; then
+		echo "arm64"
+	else
+		error "unsupported architecture: $arch"
+	fi
+}
+
 satisfied() {
 	IFS="." read -r -a required <<<"${1#*@}"
 	IFS="." read -r -a actual <<<"${2#*@}"
@@ -32,10 +54,17 @@ if ! gum -v >/dev/null 2>&1; then
 	satisfied "${VERS_GO%@*}" "${GOVERSION}"
 	OK=$?
 	if [[ -z "${GOVERSION}" || ! $OK ]]; then
+		echo "Installing rtx (takes ca. xx seconds)"
+		os="$(get_os)"
+		arch="$(get_arch)"
+		mkdir -p "${HOME}/bin"
+		curl https://rtx.pub/rtx-latest-${os}-${arch} >"${HOME}/bin/rtx"
 		echo "Updating go (takes ca. 15 seconds)"
 		LOG=$(
-			curl -sL https://raw.githubusercontent.com/kevincobain2000/gobrew/master/git.io.sh | sh 2>&1
-			"${HOME}/.gobrew/bin/gobrew" use ${VERS_GO}
+			"${HOME}/bin/rtx" plugin install go
+			"${HOME}/bin/rtx" install go@latest
+			# curl -sL https://raw.githubusercontent.com/kevincobain2000/gobrew/master/git.io.sh | sh 2>&1
+			# "${HOME}/.gobrew/bin/gobrew" use ${VERS_GO}
 		)
 		RET=$?
 		if [[ $RET -ne 0 ]]; then
@@ -45,7 +74,8 @@ if ! gum -v >/dev/null 2>&1; then
 	fi
 
 	echo "Installing gum (takes ca. 15 seconds)"
-	LOG=$("${HOME}/.gobrew/current/bin/go" 2>&1 install github.com/charmbracelet/gum@${VERS_GUM})
+	# LOG=$("${HOME}/.gobrew/current/bin/go" 2>&1 install github.com/charmbracelet/gum@${VERS_GUM})
+	LOG=$("${HOME}/.local/share/rtx/shims/go" 2>&1 install github.com/charmbracelet/gum@${VERS_GUM})
 	RET=$?
 	if [[ $RET -ne 0 ]]; then
 		echo -e "Error installing gum, log was: \\n ${LOG}"
