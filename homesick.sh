@@ -54,7 +54,7 @@ if ! gum -v >/dev/null 2>&1; then
 	satisfied "${VERS_GO%@*}" "${GOVERSION}"
 	OK=$?
 	if [[ -z "${GOVERSION}" || ! $OK ]]; then
-		echo "Installing rtx (takes ca. xx seconds)"
+		echo "Installing rtx"
 		os="$(get_os)"
 		if [[ "${os}" == "macos" ]]; then
 			brew install rtx
@@ -62,15 +62,15 @@ if ! gum -v >/dev/null 2>&1; then
 		else
 			arch="$(get_arch)"
 			mkdir -p "${HOME}/bin"
-			curl https://rtx.pub/rtx-latest-${os}-${arch} >"${HOME}/bin/rtx"
+			curl -sL "https://rtx.pub/rtx-latest-${os}-${arch}" >"${HOME}/bin/rtx"
 			chmod 755 "${HOME}/bin/rtx"
 			RTX="${HOME}/bin/rtx"
 		fi
 		echo "Updating go (takes ca. 15 seconds)"
 		LOG=$(
-			"${RTX}" plugin install go
-			"${RTX}" install go@latest
-			"${RTX}" use -g go@latest
+			"${RTX}" 2>&1 plugin install go
+			"${RTX}" 2>&1 install go@latest
+			"${RTX}" 2>&1 use -g go@latest
 		)
 		RET=$?
 		if [[ $RET -ne 0 ]]; then
