@@ -8,9 +8,5 @@ if [[ ! ":${PATH}:" == *:${GOPATH}/bin:* ]]; then
 	export PATH="${GOPATH}/bin:${PATH}"
 fi
 
-# look for go version manager
-if [[ -d "${HOME}/.gobrew/bin" && ! ":${PATH}:" == *:${HOME}/.gobrew/bin:* ]]; then
-	# path has not yet been added
-	export PATH="${HOME}/.gobrew/current/bin:${HOME}/.gobrew/bin:${PATH}"
-	export GOROOT="${HOME}/.gobrew/current/go"
-fi
+# rtx will handle the rest, e.g. adding the correct PATH during interactive sessions
+# or via the shim that gets added to the path soon
