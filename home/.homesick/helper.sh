@@ -1,5 +1,16 @@
 #! /usr/bin/env bash
 
+if [[ "${BASH_VERSINFO[0]}" -lt 4 ]]; then
+	if [[ -x /opt/homebrew/bin/bash ]]; then
+    /opt/homebrew/bin/bash -c "$0"
+  elif [[ -x /usr/local/bin/bash ]]; then
+    /usr/local/bin/bash -c "$0"
+  else
+    echo "Your bash is too old."
+    exit 1
+  fi
+fi
+
 [[ -x "/usr/bin/uname" ]] && UNAME="/usr/bin/uname"
 [[ -x "/bin/uname" ]] && UNAME="/bin/uname"
 
@@ -103,7 +114,7 @@ check_brewed() {
 	mapfile -t packages < <(brew list --versions | sed -e 's/ /@/')
 	for n in "${desired[@]}"; do
 		if ! has_version "$n" "${packages[@]}"; then
-			a+=("${n}")
+			a+=("${n/@*/}")
 		fi
 	done
 }
