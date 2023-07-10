@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env zsh
 
 if [[ -f "${HOME}/.homesick/repos/homesick/homesick.sh" ]]; then
 	source "${HOME}/.homesick/repos/homesick/homesick.sh"

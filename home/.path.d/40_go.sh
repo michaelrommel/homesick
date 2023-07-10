@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 # Go location
 GOPATH=$(readlink -f "${HOME}/software")/go

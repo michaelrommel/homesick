@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 if [[ -f "${HOME}/.homesick/repos/homesick/homesick.sh" ]]; then
 	# shellcheck source=./homesick.sh
