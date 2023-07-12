@@ -1,14 +1,19 @@
 #! /usr/bin/env bash
 
-if [[ "${BASH_VERSINFO[0]}" -lt 4 ]]; then
+is_zsh() {
+	MYSH=$(ps -o comm= $$)
+	if [[ "${MYSH}" =~ "zsh" ]]; then return 0; else return 1; fi
+}
+
+if ! $is_zsh && [[ "${BASH_VERSINFO[0]}" -lt 4 ]]; then
 	if [[ -x /opt/homebrew/bin/bash ]]; then
-    /opt/homebrew/bin/bash -c "$0"
-  elif [[ -x /usr/local/bin/bash ]]; then
-    /usr/local/bin/bash -c "$0"
-  else
-    echo "Your bash is too old."
-    exit 1
-  fi
+		/opt/homebrew/bin/bash -c "$0"
+	elif [[ -x /usr/local/bin/bash ]]; then
+		/usr/local/bin/bash -c "$0"
+	else
+		echo "Your bash is too old."
+		exit 1
+	fi
 fi
 
 [[ -x "/usr/bin/uname" ]] && UNAME="/usr/bin/uname"
@@ -81,19 +86,6 @@ has_version() {
 				satisfied "${vers_required}" "${vers_installed}"
 				return $?
 			fi
-			# IFS="." read -r -a vers_installed <<<"${p#*@}"
-			# if [[ "$pkg_required" == "$pkg_installed" ]]; then
-			# 	if ((${vers_required[0]} > ${vers_installed[0]})); then
-			# 		return 1
-			# 	else
-			# 		if ((${vers_required[0]} == ${vers_installed[0]} && \
-			# 			${vers_required[1]} > ${vers_installed[1]})); then
-			# 			return 1
-			# 		else
-			# 			return 0
-			# 		fi
-			# 	fi
-			# fi
 		else
 			# no version requirement
 			local pkg_installed="${p%%@*}"
