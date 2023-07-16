@@ -29,6 +29,21 @@ get_arch() {
 	fi
 }
 
+install_rtx() {
+	echo "Installing rtx"
+	os="$(get_os)"
+	if [[ "${os}" == "macos" ]]; then
+		brew install rtx
+		RTX=rtx
+	else
+		arch="$(get_arch)"
+		mkdir -p "${HOME}/bin"
+		curl -sL "https://rtx.pub/rtx-latest-${os}-${arch}" >"${HOME}/bin/rtx"
+		chmod 755 "${HOME}/bin/rtx"
+		RTX="${HOME}/bin/rtx"
+	fi
+}
+
 satisfied() {
 	IFS="." read -r -a required <<<"${1#*@}"
 	IFS="." read -r -a actual <<<"${2#*@}"
@@ -42,8 +57,42 @@ satisfied() {
 			return 0
 		fi
 	fi
-
 }
+
+QUICK=0
+while getopts ":q" opt; do
+	case $opt in
+	q) QUICK=1 ;;
+	\?)
+		echo "Invalid option: -$OPTARG" >&2
+		;;
+	esac
+done
+
+# Always install rtx
+install_rtx
+
+# Always install homesick, if not already present
+if [[ ! -f ${HOME}/.homesick/repos/homesick/homesick.sh ]]; then
+	echo "Installing homesick"
+	git clone https://github.com/michaelrommel/homesick.git "${HOME}/.homesick/repos/homesick"
+else
+	echo "Updating homesick"
+	pushd "${HOME}/.homesick/repos/homesick" || exit
+	git pull
+	popd || exit
+fi
+
+# shellcheck disable=1091
+source "${HOME}/.homesick/repos/homesick/homesick.sh"
+
+# link the defaults for a basic account
+homesick link -f -b "homesick"
+
+if [[ "${QUICK}" -eq 1 ]]; then
+	echo "Quick installation, exiting early."
+	exit 0
+fi
 
 if ! gum -v >/dev/null 2>&1; then
 	GOVERSION=$(go version 2>/dev/null | {
@@ -54,18 +103,6 @@ if ! gum -v >/dev/null 2>&1; then
 	satisfied "${VERS_GO%@*}" "${GOVERSION}"
 	OK=$?
 	if [[ -z "${GOVERSION}" || ! $OK ]]; then
-		echo "Installing rtx"
-		os="$(get_os)"
-		if [[ "${os}" == "macos" ]]; then
-			brew install rtx
-			RTX=rtx
-		else
-			arch="$(get_arch)"
-			mkdir -p "${HOME}/bin"
-			curl -sL "https://rtx.pub/rtx-latest-${os}-${arch}" >"${HOME}/bin/rtx"
-			chmod 755 "${HOME}/bin/rtx"
-			RTX="${HOME}/bin/rtx"
-		fi
 		echo "Updating go (takes ca. 15 seconds)"
 		LOG=$(
 			"${RTX}" 2>&1 plugin install go
@@ -88,15 +125,15 @@ if ! gum -v >/dev/null 2>&1; then
 	fi
 fi
 
-printComma() {
-	printf "%s," "${@:1:${#}-1}"
-	printf "%s" "${@:${#}}"
-}
-
 # printNewline() {
 # 	printf "%s\n" "${@:1:${#}-1}"
 # 	echo "${@:${#}}"
 # }
+
+printComma() {
+	printf "%s," "${@:1:${#}-1}"
+	printf "%s" "${@:${#}}"
+}
 
 gum style --border rounded --width 70 --margin "1 1" --align center --italic --bold \
 	--foreground 4 "Bootstrapping dotfile manager" "(homesick installation)"
@@ -118,16 +155,6 @@ while read -r castle; do
 		castles+=("${castle}")
 	fi
 done < <(echo "${selection[@]}")
-
-if [[ ! -f ${HOME}/.homesick/repos/homesick/homesick.sh ]]; then
-	git clone https://github.com/michaelrommel/homesick.git "${HOME}/.homesick/repos/homesick"
-fi
-
-# shellcheck disable=1091
-source "${HOME}/.homesick/repos/homesick/homesick.sh"
-
-# link the defaults for a basic account
-homesick link -f -b "homesick"
 
 # set up additional castles, if requested
 if [[ ${#castles[@]} -eq 0 ]]; then
