@@ -83,6 +83,16 @@ else
 	popd || exit
 fi
 
+if [[ ! -f ${HOME}/.zshrc ]]; then
+	# shellcheck disable=SC2016
+	echo 'source "${HOME}/.minimalrc"' >"${HOME}/.zshrc"
+else
+	if ! grep ".minimalrc" "${HOME}/.zshrc"; then
+		# shellcheck disable=SC2016
+		echo 'source "${HOME}/.minimalrc"' >>"${HOME}/.zshrc"
+	fi
+fi
+
 # shellcheck disable=1091
 source "${HOME}/.homesick/repos/homesick/homesick.sh"
 
