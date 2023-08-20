@@ -105,8 +105,11 @@ check_brewed() {
 	local packages
 	mapfile -t packages < <(brew list --versions | sed -e 's/ /@/')
 	for n in "${desired[@]}"; do
-		if ! has_version "$n" "${packages[@]}"; then
-			a+=("${n/@*/}")
+		# remove formulae info
+		pkg=${n##*/}
+		if ! has_version "$pkg" "${packages[@]}"; then
+			# add only base name
+			a+=("${pkg/@*/}")
 		fi
 	done
 }
