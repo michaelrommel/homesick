@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERS_GO=1.20@latest
+VERS_GO=1.22@latest
 VERS_GUM=latest
 
 GOPATH=$(readlink -f "${HOME}/software")/go
@@ -29,26 +29,23 @@ get_arch() {
 	fi
 }
 
-install_rtx() {
-	echo "Installing rtx"
+install_mise() {
+	echo "Installing mise"
 	os="$(get_os)"
 	if [[ "${os}" == "macos" ]]; then
-		brew install rtx
-		RTX=rtx
+		brew install mise
+		MISE=mise
 	else
 		arch="$(get_arch)"
 		mkdir -p "${HOME}/bin"
-		if ! curl -sL "https://rtx.pub/rtx-latest-${os}-${arch}" >"${HOME}/bin/rtx"; then
-			echo "First download failed."
-			latest=$(curl -s https://api.github.com/repos/jdxcode/rtx/tags | jq -r ".[0].name")
-			echo "Latest release seems to be: ${latest}"
-			if ! curl -sL "https://github.com/jdxcode/rtx/releases/download/${latest}/rtx-${latest}-${os}-${arch}" >"${HOME}/bin/rtx"; then
-				echo "Second download failed, too. Aborting."
-				exit 1
-			fi
+		latest=$(curl -s https://api.github.com/repositories/586920414/tags | jq -r ".[0].name")
+		echo "Latest release seems to be: ${latest}"
+		if ! curl -sL "https://github.com/jdx/mise/releases/download/${latest}/mise-${latest}-${os}-${arch}" >"${HOME}/bin/mise"; then
+			echo "Download failed. Aborting."
+			exit 1
 		fi
-		chmod 755 "${HOME}/bin/rtx"
-		RTX="${HOME}/bin/rtx"
+		chmod 755 "${HOME}/bin/mise"
+		MISE="${HOME}/bin/mise"
 	fi
 }
 
@@ -77,8 +74,8 @@ while getopts ":q" opt; do
 	esac
 done
 
-# Always install rtx
-install_rtx
+# Always install mise
+install_mise
 
 # Always install homesick, if not already present
 if [[ ! -f ${HOME}/.homesick/repos/homesick/homesick.sh ]]; then
@@ -123,9 +120,9 @@ if ! gum -v >/dev/null 2>&1; then
 	if [[ -z "${GOVERSION}" || ! $OK ]]; then
 		echo "Updating go (takes ca. 15 seconds)"
 		LOG=$(
-			"${RTX}" 2>&1 plugin install go
-			"${RTX}" 2>&1 install go@latest
-			"${RTX}" 2>&1 use -g go@latest
+			"${MISE}" 2>&1 plugin install go
+			"${MISE}" 2>&1 install go@latest
+			"${MISE}" 2>&1 use -g go@latest
 		)
 		RET=$?
 		if [[ $RET -ne 0 ]]; then
@@ -135,7 +132,7 @@ if ! gum -v >/dev/null 2>&1; then
 	fi
 
 	echo "Installing gum (takes ca. 15 seconds)"
-	LOG=$("${HOME}/.local/share/rtx/shims/go" 2>&1 install github.com/charmbracelet/gum@${VERS_GUM})
+	LOG=$("${HOME}/.local/share/mise/shims/go" 2>&1 install github.com/charmbracelet/gum@${VERS_GUM})
 	RET=$?
 	if [[ $RET -ne 0 ]]; then
 		echo -e "Error installing gum, log was: \\n ${LOG}"

@@ -7,7 +7,7 @@ You can bootstrap a new system by using this command:
 curl -sL https://michaelrommel.github.io/homesick/homesick.sh | /bin/bash -s -e
 ```
 
-or if a minimalistic install with only homesick and rtx is wished for:
+or if a minimalistic install with only homesick and mise is wished for:
 
 ```
 curl -sL https://michaelrommel.github.io/homesick/homesick.sh | /bin/bash -s -e -- -q
