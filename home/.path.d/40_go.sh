@@ -8,5 +8,5 @@ if [[ ! ":${PATH}:" == *:${GOPATH}/bin:* ]]; then
 	export PATH="${GOPATH}/bin:${PATH}"
 fi
 
-# rtx will handle the rest, e.g. adding the correct PATH during interactive sessions
+# mise will handle the rest, e.g. adding the correct PATH during interactive sessions
 # or via the shim that gets added to the path soon
