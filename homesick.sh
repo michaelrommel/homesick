@@ -47,7 +47,7 @@ install_mise() {
 		chmod 755 "${HOME}/bin/mise"
 		MISE="${HOME}/bin/mise"
 		export PATH="${HOME}/.local/share/mise/shims:${PATH}"
-		eval "$(${MISE} activate zsh)"
+		eval "$(${MISE} activate bash)"
 	fi
 }
 
@@ -79,7 +79,7 @@ done
 # check prerequisites
 PREREQMISS=0
 for p in git curl jq; do
-	if ! $p --version; then
+	if ! $p --version >/dev/null 2>&1; then
 		echo "Prerequisite missing: $p"
 		PREREQMISS=1
 	fi
