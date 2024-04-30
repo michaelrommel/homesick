@@ -106,7 +106,7 @@ if [[ ! -f ${HOME}/.zshrc ]]; then
 	# shellcheck disable=SC2016
 	echo 'source "${HOME}/.minimalrc"' >"${HOME}/.zshrc"
 else
-	if ! grep ".minimalrc" "${HOME}/.zshrc"; then
+	if ! grep >/dev/null ".minimalrc" "${HOME}/.zshrc"; then
 		# shellcheck disable=SC2016
 		echo 'source "${HOME}/.minimalrc"' >>"${HOME}/.zshrc"
 	fi
@@ -137,6 +137,7 @@ if ! gum -v >/dev/null 2>&1; then
 			"${MISE}" 2>&1 plugin install go
 			"${MISE}" 2>&1 install go@latest
 			"${MISE}" 2>&1 use -g go@latest
+			"${MISE}" reshim
 		)
 		RET=$?
 		if [[ $RET -ne 0 ]]; then
@@ -152,6 +153,7 @@ if ! gum -v >/dev/null 2>&1; then
 		echo -e "Error installing gum, log was: \\n ${LOG}"
 		exit 1
 	fi
+	"${MISE}" reshim
 fi
 
 # printNewline() {
