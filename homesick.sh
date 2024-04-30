@@ -46,8 +46,7 @@ install_mise() {
 		fi
 		chmod 755 "${HOME}/bin/mise"
 		MISE="${HOME}/bin/mise"
-		export PATH="${HOME}/.local/share/mise/shims:${PATH}"
-		eval "$(${MISE} activate bash)"
+		eval "$(${MISE} activate --shims)"
 	fi
 }
 
