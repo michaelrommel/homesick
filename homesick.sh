@@ -46,6 +46,8 @@ install_mise() {
 		fi
 		chmod 755 "${HOME}/bin/mise"
 		MISE="${HOME}/bin/mise"
+		export PATH="${HOME}/.local/share/mise/shims:${PATH}"
+		eval "$(${MISE} activate zsh)"
 	fi
 }
 
@@ -73,6 +75,18 @@ while getopts ":q" opt; do
 		;;
 	esac
 done
+
+# check prerequisites
+PREREQMISS=0
+for p in git curl jq; do
+	if ! $p --version; then
+		echo "Prerequisite missing: $p"
+		PREREQMISS=1
+	fi
+done
+if [[ $PREREQMISS -gt 0 ]]; then
+	exit 1
+fi
 
 # Always install mise
 install_mise
