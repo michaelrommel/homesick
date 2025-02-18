@@ -3,10 +3,6 @@
 VERS_GO=1.22@latest
 VERS_GUM=latest
 
-GOPATH=$(readlink -f "${HOME}/software")/go
-export GOPATH
-export PATH="${GOPATH}/bin:${PATH}"
-
 get_os() {
 	os="$(uname -s)"
 	if [ "$os" = Darwin ]; then
@@ -28,6 +24,20 @@ get_arch() {
 		error "unsupported architecture: $arch"
 	fi
 }
+
+SW=$(readlink -f "${HOME}/software")
+if [[ -z "$SW" ]]; then
+	os="$(get_os)"
+	if [[ "${os}" == "macos" ]]; then
+		mkdir ~/Software
+	else
+		mkdir ~/software
+	fi
+fi
+
+GOPATH=$(readlink -f "${HOME}/software")/go
+export GOPATH
+export PATH="${GOPATH}/bin:${PATH}"
 
 install_mise() {
 	echo "Installing mise"
@@ -92,8 +102,9 @@ install_mise
 
 # Always install homesick, if not already present
 if [[ ! -f ${HOME}/.homesick/repos/homesick/homesick.sh ]]; then
-	echo "Installing homesick"
+	echo "Installing homesick and bash"
 	git clone https://github.com/michaelrommel/homesick.git "${HOME}/.homesick/repos/homesick"
+	brew install bash
 else
 	echo "Updating homesick"
 	pushd "${HOME}/.homesick/repos/homesick" || exit
@@ -133,7 +144,7 @@ if ! gum -v >/dev/null 2>&1; then
 	if [[ -z "${GOVERSION}" || ! $OK ]]; then
 		echo "Updating go (takes ca. 15 seconds)"
 		LOG=$(
-			"${MISE}" 2>&1 plugin install go
+			# "${MISE}" 2>&1 plugin install go
 			"${MISE}" 2>&1 install go@latest
 			"${MISE}" 2>&1 use -g go@latest
 			"${MISE}" reshim
@@ -143,6 +154,7 @@ if ! gum -v >/dev/null 2>&1; then
 			echo -e "Error updating go, log was: \\n ${LOG}"
 			exit 1
 		fi
+		export PATH=${HOME}/.local/share/mise/shims/:${PATH}
 	fi
 
 	echo "Installing gum (takes ca. 15 seconds)"
