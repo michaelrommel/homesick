@@ -13,8 +13,8 @@ else
 fi
 
 # look for version manager
-if [[ -n "${MISE}" && ! ":${PATH}:" == *:${HOME}/.local/share/mise/shims:* ]]; then
-	# path has not yet been added
-	export PATH="${HOME}/.local/share/mise/shims:${PATH}"
-	eval "$(${MISE} activate bash)"
-fi
+# if [[ -n "${MISE}" && ! ":${PATH}:" == *:${HOME}/.local/share/mise/shims:* ]]; then
+# 	# path has not yet been added
+# 	export PATH="${HOME}/.local/share/mise/shims:${PATH}"
+# fi
+eval "$(${MISE} activate bash)"
